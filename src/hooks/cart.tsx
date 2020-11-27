@@ -44,27 +44,46 @@ const CartProvider: React.FC = ({ children }) => {
         return setProducts([...products, { ...product, quantity: 1 }]);
       }
 
-      const { quantity } = products[index];
+      const updatedProducts = products.map((mappedProduct, findIndex) => {
+        if (index !== findIndex) {
+          return mappedProduct;
+        }
+        return { ...mappedProduct, quantity: mappedProduct.quantity + 1 };
+      });
 
-      const sameProducts = products.filter(
-        (_product, findIndex) => index !== findIndex,
-      );
-
-      return setProducts([
-        ...sameProducts,
-        { ...product, quantity: quantity + 1 },
-      ]);
+      return setProducts(updatedProducts);
     },
     [products],
   );
 
-  const increment = useCallback(async _id => {
-    // TODO INCREMENTS A PRODUCT QUANTITY IN THE CART
-  }, []);
+  const increment = useCallback(
+    async id => {
+      const updatedProducts = products.map(product => {
+        if (product.id !== id) {
+          return product;
+        }
+        return { ...product, quantity: product.quantity + 1 };
+      });
 
-  const decrement = useCallback(async _id => {
-    // TODO DECREMENTS A PRODUCT QUANTITY IN THE CART
-  }, []);
+      return setProducts(updatedProducts);
+    },
+    [products],
+  );
+
+  const decrement = useCallback(
+    async id => {
+      const updatedProducts = products.map(product => {
+        if (product.id !== id) {
+          return product;
+        }
+        const newQuantity = product.quantity - 1;
+        return { ...product, quantity: newQuantity > 0 ? newQuantity : 0 };
+      });
+
+      return setProducts(updatedProducts);
+    },
+    [products],
+  );
 
   const value = React.useMemo(
     () => ({ addToCart, increment, decrement, products }),
